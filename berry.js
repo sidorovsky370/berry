@@ -17,24 +17,24 @@
 		};
 	}
 
-// создаем объект seed
-	if (!window.seed) {
-		window.seed = {};
-		seed = window.seed;
+// создаем объект berry
+	if (!window.berry) {
+		window.berry = {};
+		berry = window.berry;
 	}
 
 // создаем пустой обьект конфига проекта
-	seed.config = {
+	berry.config = {
 		'AMD' : {
 			repeat : 5,
 			cache : true
 		}
 	};
 // создаем пустой обьект для хранения общих функций проекта
-	seed.fn = {};
+	berry.fn = {};
 
 // метод Merge - расширяем свойства объекта
-	seed.merge = seed.fn.merge = function(obj) {
+	berry.merge = berry.fn.merge = function(obj) {
 		obj = obj || {};
 
 		for(var i = 1; i < arguments.length; i++) {
@@ -48,14 +48,14 @@
 
 // AMD функционал
 // модули, которые были определены
-	seed.defined = {};
+	berry.defined = {};
 
-	if( !seed.plugins ) {
-		seed.config.AMD.plugins = '/js/seed/beta/seed.plugins.js';
+	if( !berry.plugins ) {
+		berry.config.AMD.plugins = '/js/berry/beta/berry.plugins.js';
 	}
 
 // AMD. Загрузка библиотеки
-	seed.get = function(name, url) {
+	berry.get = function(name, url) {
 		var self = this;
 
 		var module = self.defined[name];
@@ -75,7 +75,7 @@
 					module.inited = true;
 					if(module.callback) {
 						if(self.config.debug) { console.info('callback-фунция: ', name, module); }
-						module.storage = (module.callback)($.seed.globals, storage[0],storage[1],storage[2],storage[3],storage[4],storage[5]);
+						module.storage = (module.callback)($.berry.globals, storage[0],storage[1],storage[2],storage[3],storage[4],storage[5]);
 						module.callback = false;
 						if(self.config.debug) { console.info(name+' storage: ',module.storage); }
 					}
@@ -86,14 +86,14 @@
 			if(module.callback)  {
 				if(self.config.debug) { console.info('callback-фунция: ', name); }
 				module.inited = true;
-				module.storage = (module.callback)($.seed.globals, storage[0],storage[1],storage[2],storage[3],storage[4],storage[5]);
+				module.storage = (module.callback)($.berry.globals, storage[0],storage[1],storage[2],storage[3],storage[4],storage[5]);
 			}
 		}
 	};
 
 	
 // определения конфига
-	seed._defineConfig = function(config, callback, require) {
+	berry._defineConfig = function(config, callback, require) {
 		var self = this;
 		var done = false;
 		var require = (require === null) ? null : true;
@@ -109,19 +109,19 @@
 	}
 
 
-	seed.init = function() {
+	berry.init = function() {
 		if( typeof(this.config.AMD.plugins) == 'string' ) {
-			seed.get('plugins', this.config.AMD.plugins);
+			berry.get('plugins', this.config.AMD.plugins);
 		}
 
-		this._defineConfig(seed.config.AMD.plugins, false, null);
+		this._defineConfig(berry.config.AMD.plugins, false, null);
 
 
 /*
 // загрузка библиотеке из GET переданного в файл
 			$('script').each(function(i, el) {
 				var src = $(el).attr('src');
-				if( /seed\.js\?AMD=true/.test( src ) ) {
+				if( /berry\.js\?AMD=true/.test( src ) ) {
 					try {
 						var query = src.replace('AMD=true','').replace(/(&|)cache=\d+/,'').split('?')[1];
 						$.each(query.split('&'), function(j, param) {
@@ -165,11 +165,11 @@
 	}
 
 
-	seed.init();
+	berry.init();
 
 /*
 // AMD прототип
-	seed.AMD.fn = seed.AMD.prototype = {
+	berry.AMD.fn = berry.AMD.prototype = {
 		init : function() {
 
 		},
@@ -221,7 +221,7 @@
 //добавим зависимость в массив
 								self.stack.push(args.depents[depent]);
 //проверим массив на повторение, чтобы не было циклической зависимости при вызове модулей
-								if( !self._check() ) { throw new Error("seed: Ошибка! Обнаружена циклическая зависимость: "+self.stack); return false; }
+								if( !self._check() ) { throw new Error("berry: Ошибка! Обнаружена циклическая зависимость: "+self.stack); return false; }
 
 								var response = self.define(args.depents[depent], ( typeof self.defined[args.depents[depent]] === 'object' ) ? self.defined[args.depents[depent]].depents : false, false );
 								if(response) {
@@ -341,7 +341,7 @@
 
 						if(callback) {
 							var storage = self._storage();
-							(callback)($.seed.globals, storage[0],storage[1],storage[2],storage[3],storage[4],storage[5]);
+							(callback)($.berry.globals, storage[0],storage[1],storage[2],storage[3],storage[4],storage[5]);
 						}
 					}
 					else {
@@ -362,7 +362,7 @@
 				if( done ) {
 					if(callback) {
 						var storage = self._storage();
-						(callback)($.seed.globals, storage[0],storage[1],storage[2],storage[3],storage[4],storage[5]);
+						(callback)($.berry.globals, storage[0],storage[1],storage[2],storage[3],storage[4],storage[5]);
 					}
 				}
 			}
@@ -379,7 +379,7 @@
 				if( done ) {
 					if(callback) {
 						var storage = self._storage();
-						(callback)($.seed.globals, storage[0],storage[1],storage[2],storage[3],storage[4],storage[5]);
+						(callback)($.berry.globals, storage[0],storage[1],storage[2],storage[3],storage[4],storage[5]);
 					}
 				}
 			}
@@ -405,7 +405,7 @@
 						module.inited = true;
 						if(module.callback)  {
 							if(self.config.debug) { console.info('callback-фунция: ', name, module); }
-							module.storage = (module.callback)($.seed.globals, storage[0],storage[1],storage[2],storage[3],storage[4],storage[5]);
+							module.storage = (module.callback)($.berry.globals, storage[0],storage[1],storage[2],storage[3],storage[4],storage[5]);
 							module.callback = false;
 							if(self.config.debug) { console.info(name+' storage: ',module.storage); }
 						}
@@ -420,7 +420,7 @@
 				if(module.callback)  {
 					if(self.config.debug) { console.info('callback-фунция: ', name); }
 					module.inited = true;
-					module.storage = (module.callback)($.seed.globals, storage[0],storage[1],storage[2],storage[3],storage[4],storage[5]);
+					module.storage = (module.callback)($.berry.globals, storage[0],storage[1],storage[2],storage[3],storage[4],storage[5]);
 				}
 			}
 
@@ -459,23 +459,23 @@
 
 */
 /*
-	$.seed.core = $.fn.seedCore = core;
+	$.berry.core = $.fn.berryCore = core;
 
 // создаем пустой обьект для локализации
-	$.seed.core.locale = {};
+	$.berry.core.locale = {};
 
-	$.fn.seedAMD = new core.AMD();
-	$.fn.seedDynamic = $.seed.core.dynamic = new core.dynamic();
+	$.fn.berryAMD = new core.AMD();
+	$.fn.berryDynamic = $.berry.core.dynamic = new core.dynamic();
 
 //Shortcut
 	$.define = function() {
-		$.fn.seedAMD.define(arguments[0], arguments[1], arguments[2], arguments[3]);
+		$.fn.berryAMD.define(arguments[0], arguments[1], arguments[2], arguments[3]);
 	};
 
 	$.require = function() {
-		$.fn.seedAMD.require(arguments[0], arguments[1]);
+		$.fn.berryAMD.require(arguments[0], arguments[1]);
 	};
 
 */
-	return seed;
+	return berry;
 })(window, document);
