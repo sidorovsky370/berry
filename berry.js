@@ -29,7 +29,7 @@
 			'repeat' : 5,
 			'cache' : true,
 			'charset' : 'UTF-8', // при значении false, скрипты будут загружаться согласно charset страницы
-			'plugins' : 'http://plarson.ru/js/berry/berry.config.js' // URL для конфига плагинов по умолчанию
+			'plugins' : '/js/berry/berry.config.js' // URL для конфига плагинов по умолчанию
         }
     };
 
@@ -71,6 +71,21 @@
     berry.defined = {};
 	
 	berry.STATE = 'loading';
+	
+	
+	berry.xhr = function(url) {
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", url);
+		xhr.send();
+
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState != 4) return;
+			if (xhr.readyState == 4) {
+				console.olog(xhr.response);
+				
+			}
+		}
+	}
 
     // AMD. Загрузка библиотеки
 	berry.get = function(name, url, skip) {
@@ -91,7 +106,11 @@
 				s.type = 'text/javascript';
 				s.src = url;
 				if( this.config.AMD.charset ) s.charset = this.config.AMD.charset;
-				n.appendChild(s);
+//				n.appendChild(s);
+				
+				console.log( s )
+				
+				berry.xhr(url);			
 
 			// биндим событие после загрузки
             s.onload = function() {
