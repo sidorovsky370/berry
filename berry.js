@@ -48,9 +48,29 @@
         return obj;
     }
 
+	// метод Unique - только уникальные значения массива
+    berry.unique = function( arr ) {
+		for ( var i = 1; i < arr.length; i++ ) {
+			if ( arr[i] === arr[ i - 1 ] ) {
+				arr.splice( i--, 1 );
+			}
+		}
+		return arr;
+	};
+	
+	 berry.ready = function(func) {
+		if (document.readyState != 'loading'){
+			func();
+		} else {
+			document.addEventListener('DOMContentLoaded', func);
+		}
+	}
+	
     // AMD функционал
     // модули, которые были определены
-    berry.defined = [];
+    berry.defined = {};
+	
+	berry.STATE = 'loading';
 
     // AMD. Загрузка библиотеки
 	berry.get = function(name, url, skip) {
@@ -178,16 +198,6 @@
 	// AMD. Определение модуля
 	/* парсим все аргументы, при необходимости заполняем дефолтными значениями. Далее передаем в функцию обновления */
     berry.define = function(name, depents, callback, data) {
-		berry.defined
-    }
-	
-	
-	// AMD. Определение модуля
-	/* парсим все аргументы, при необходимости заполняем дефолтными значениями. Далее передаем в функцию обновления */
-    berry._define = function(name, depents, callback, data) {
-
-		console.log('_define', arguments);
-	
         //Если первый полученный аргумент Объект и второй функция или не передан, то значит мы получили конфиг и обработаем его через специальную функцию.
         if (typeof arguments[0] === "object") {
             berry._config(arguments[0], arguments[1]);
@@ -225,75 +235,90 @@
 			// если аргументы не нашли, то поставим их значение по умолчанию равным false
 			if (!args.depents) args.depents = false;
             if (!args.callback) args.callback = false;
-            if (!args.data) args.data = false;
-
-			// если в были определены зависимости для модуля и параметр require не равен null, то проверим весь список зависимостей и загрузим их
-            if (args.depents && args.data.require !== null) {
-
-				// перерменная необходимости загрузки
-                var check = true;
-
-				// проверим массив зависимостей, если в нем есть значения (0, null, false), то такой модуль не будем загружать
-				/*
-					По логике мы можем передать в массиве зависимостей не только name модулей, от который зависит текущий модуль,
-					но и булевые значения, например проверку на существование элементов DOM или значение test регулярного выражения,
-					вобщем любое проверочное уравнение, которое возвращает true\false.
-				*/
-                args.depents.forEach(function(name) {
-                    if (!name) check = false;
-                })
-
-				// если перерменная необходимости загрузки все еще true, то модуль на до грузить
-                if (check === true) {
-                    //Запустим обновление модулей рекурсивно проверяя зависимости
-                    var done = false;
-
-                    args.depents.forEach(function(depent) {
-						if (typeof depent === 'string') {
-                            //добавим зависимость в массив
-                            berry.stack.push(args.depents[depent]);
-
-                            //проверим массив на повторение, чтобы не было циклической зависимости при вызове модулей
-                            if (!berry._check()) {
-                                throw new Error("berry: Ошибка! Обнаружена циклическая зависимость: " + berry.stack);
-                                return false;
-                            }
-
-                            var response = berry.define(depent, (typeof berry.defined[depent] === 'object') ? berry.defined[depent].depents : false, false);
-							
-                            if (response) done = true;
-                        }
-						
-						else {
-                            done = true;
-                        }
-                    });
-
-                    if (done) {
-                        berry._update(args.name, args.depents, args.callback, args.data);
-                        return true;
-                    }
-                }
-
-				// если перерменная необходимости загрузки равна false, то значит нет необходимости грузить модуль
-				else {
-					// сбросим параметр require в null, это необходимо если данный модуль будет вызван позже и пройдет проверку необходимости загрузки
-                    this.extend(args.data, {
-                        require: null
-                    });
-					
-                    return false;
-                }
-            }
+			if (!args.data) args.data = false;
 			
-			// если параметр require не равен null, тогда обновим параметры модуль используя обьект аргументов
-			else {
-                berry._update(args.name, args.depents, args.callback, args.data);
-                return true;
-            }
+			berry._update(args.name, args.depents, args.callback, args.data);
         }
     }
+	
+	
+	// AMD. Определение модуля
+	/* парсим все аргументы и передаем в функцию обновления */
+    berry._define = function(args) {
+		// если в были определены зависимости для модуля и параметр require не равен null, то проверим весь список зависимостей и загрузим их
+		if (args.depents && args.data.require !== null) {
 
+			// перерменная необходимости загрузки
+			var check = true;
+			// проверим массив зависимостей, если в нем есть значения (0, null, false), то такой модуль не будем загружать
+			/*
+				По логике мы можем передать в массиве зависимостей не только name модулей, от который зависит текущий модуль,
+				но и булевые значения, например проверку на существование элементов DOM или значение test регулярного выражения,
+				вобщем любое проверочное уравнение, которое возвращает true\false.
+			*/
+			args.depents.forEach(function(name) {
+				if (!name) check = false;
+			})
+
+			// если перерменная необходимости загрузки все еще true, то модуль на до грузить
+			if (check === true) {
+				//Запустим обновление модулей рекурсивно проверяя зависимости
+				var done = false;
+				
+				args.depents.forEach(function(depent) {
+					if (typeof depent === 'string') {
+						//добавим зависимость в массив
+						berry.stack.push(args.depents[depent]);
+
+						//проверим массив на повторение, чтобы не было циклической зависимости при вызове модулей
+						if (!berry._check()) {
+//							throw new Error("berry: Ошибка! Обнаружена циклическая зависимость: " + berry.stack);
+//							return false;
+						}
+						
+						var response = berry._define( berry.defined[depent] );
+						if (response) done = true;
+					}
+					
+					else {
+						done = true;
+					}
+				});
+
+				if (done && berry.STATE == 'ready' && args.data.require === true && args.data.inited !== true) {
+					//berry._update(args.name, args.depents, args.callback, args.data);
+					berry.get(args.name);
+					return true;
+				}
+			}
+
+			// если перерменная необходимости загрузки равна false, то значит нет необходимости грузить модуль
+			else {
+				// сбросим параметр require в null, это необходимо если данный модуль будет вызван позже и пройдет проверку необходимости загрузки
+				this.extend(args.data, {
+					require: null
+				});
+				
+				return false;
+			}
+		}
+		
+		// если параметр require не равен null, тогда обновим параметры модуль используя обьект аргументов
+		else {
+			//berry._update(args.name, args.depents, args.callback, args.data);
+			if (berry.STATE == 'ready') berry.get(args.name);
+			return true;
+		}
+    }
+
+	// AMD. Вызов всех определенных модулей
+	/* Инициализируем все модули, которые были определены ранее */
+	berry._request = function() {
+		for (var module in berry.defined) {
+			berry._define(berry.defined[module]);
+		}
+	}
+	
 	// AMD. Определения конфига
     berry._config = function(config, callback, require) {
         var self = this;
@@ -324,7 +349,12 @@
 		var self = this;
 		if(self.config.debug) console.info('callback-фунция: ', name);
 
-		module.returned = (module.callback)(module.storage);
+		module.returned = (function(){
+			(module.callback)(module.storage);
+		})();
+		
+		console.log( module.storage );
+		
 		if(module.returned) { module.storage[name] = module.returned; }
 
 		module.callback = ( module.storage.length > 0 ) ? function() {} : false;
@@ -339,25 +369,25 @@
     berry._update = function(name, depents, callback, data) {
         var self = this;
         var options = {};
-
+		
         //находим модуль, если такого модуля нет - создаем новый пустой.
-        var module = (self.defined[name]) ? (self.defined[name]) : (self.defined[name] = {});
-		module.name = name;
-
+        var module = (self.defined[name])
+						? (self.defined[name]) : (self.defined[name] = {
+							name : name,
+							depents : depents,
+							callback : callback,
+							data : data							
+						});
+		
         //если переданы зависимости, до добавим их как новые, либо добавим их как дополнительные
         if (depents) {
             options.depents = depents;
-
-            if (module.depents) options.depents = $.unique(depents.concat(module.depents));
-        }
-
-        //обновляем callback-функцию
-        if (callback) options.callback = callback;
+            if (module.depents) options.depents = berry.unique(depents.concat(module.depents));
+        }		
 
         //обновляем общие даные
         if (data) {
             options.path = data.path;
-            options.name = data.name;
             options.storage = data.storage;
             options.require = (data.require === null) ? false : true;
         }
@@ -377,10 +407,12 @@
         //первоначальная инцииализация дефолтных значений
         if (!module.inited) options.inited = false;
 
-        berry.extend(module, options);
+		module.data = berry.extend(data, options);
+		self.defined[name].data = module.data;
 
-        //загружаем модуль если он  необходим и все еще не был загружен
-        if (module.require === true && module.inited !== true) berry.get(name);
+        //загружаем модуль если он необходим и все еще не был загружен
+//		if (self.STATE == 'ready' && module.require === true && module.inited !== true) berry.get(name);
+//		else if (self.STATE == 'ready' && module.inited !== true) self._define( self.defined[name] );
     }
 
 	// AMD. Сохраняем значение callback-функции, нужно для прокидывания в зависмые модули
@@ -391,8 +423,6 @@
 		var storage = module.storage || {};
 
 		if( module.depents ) {
-			console.log( module.depents );
-			
 			module.depents.forEach(function(name) {
 				try {
 					self.extend(storage, self.defined[name].storage);
@@ -408,6 +438,7 @@
 
 	// AMD. Проверка цепочки зависимостей
     berry._check = function() {
+		return;
         var check = true;
         var temp = [];
 		
@@ -419,6 +450,9 @@
             });
             temp.push(i);
         });
+		
+		console.log(temp, check);
+		
         return check;
     }
 
@@ -439,10 +473,16 @@
 //	    this._config(this.config.AMD.plugins, false, null);
 
 
-        berry.core = {};
+        this.core = {};
 
         // создаем пустой обьект для локализации
-        berry.core.locale = {};
+        this.core.locale = {};
+		
+		this.ready(function() {
+			if(berry.config.debug) {} console.log('%cDOM ready', 'color: #409f00; font-weight: bold');
+			berry.STATE = 'ready';
+			berry._request();
+		});
     }
 
 	// обратная совместимость с seed 1.0

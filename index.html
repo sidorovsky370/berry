@@ -62,23 +62,23 @@
 			console.log('Custom plugins loaded');
 		});
 	  
+		*/
   
 		// опрделение модуля 'jquery.1.7.1' с указанным path в обьекте
 		define('jquery.1.7.1', {path: 'https://code.jquery.com/jquery-1.7.1.min.js'}, function() {
 			return window;
 		});		  
-		*/
 		
 		// опрделение модуля 'live', с зависмостью от модуля 'jquery.1.7.1'
-		define('live', ['menu'], function(a) {
-			console.log( 1 == a, a);
+		define('live', ['menu', 'jquery.1.7.1'], function(scope) {
+			console.log('live callback: ', scope);
 		});	  
 
 		// опрделение модуля 'menu'
 		define('menu', function() {
 			var a = 1;
 			return a;
-		});		  		
+		});
 	
 
      
