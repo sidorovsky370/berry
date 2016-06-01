@@ -26,10 +26,10 @@
     // дефолтный конфиг проекта
     berry.config = {
         'AMD': {
-			'repeat' : 5,
-			'cache' : true,
-			'charset' : 'UTF-8', // при значении false, скрипты будут загружаться согласно charset страницы
-			'plugins' : '/js/berry/berry.config.js' // URL для конфига плагинов по умолчанию
+		'repeat' : 5,
+		'cache' : true,
+		'charset' : 'UTF-8', // при значении false, скрипты будут загружаться согласно charset страницы
+		'plugins' : '/js/berry/berry.config.js' // URL для конфига плагинов по умолчанию
         }
     };
 
@@ -75,14 +75,13 @@
 	
 	berry.xhr = function(url) {
 		var xhr = new XMLHttpRequest();
-		xhr.open("POST", url);
+		xhr.open("GET", url, true);
 		xhr.send();
 
 		xhr.onreadystatechange = function() {
 			if (xhr.readyState != 4) return;
 			if (xhr.readyState == 4) {
-				console.olog(xhr.response);
-				
+				console.log(xhr.response);
 			}
 		}
 	}
