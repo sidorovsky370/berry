@@ -9,34 +9,27 @@
   <body>
     <script>
 	/*
-		// РѕРїСЂРґРµР»РµРЅРёРµ РјРѕРґСѓР»СЏ 'menu'
-		define('menu', function() {
-			console.log("module 'menu' loaded");
-			var a = 1;
-			return a;
-		});
-
-		// РѕРїСЂРґРµР»РµРЅРёРµ РјРѕРґСѓР»СЏ 'oldmenu' СЃ РїРѕРґРґРµСЂР¶РєРѕР№ РѕР±СЂР°С‚РЅРѕР№ СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё
+		// опрделение модуля 'oldmenu' с поддержкой обратной совместимости
 		$.define('oldmenu', function() {
 			console.log("module 'oldmenu' loaded");
 			var a = 2;
 			return a;
 		});
 
-		// РѕРїСЂРґРµР»РµРЅРёРµ РјРѕРґСѓР»СЏ 'item' СЃ Р·Р°РІРёСЃРёРјРѕСЃС‚СЊСЋ РѕС‚ РјРѕРґСѓР»СЏ 'menu'
+		// опрделение модуля 'item' с зависимостью от модуля 'menu'
 		define('item', ['menu'], function() {
 			console.log("module 'item' loaded, depence from 'menu'");
 		});
 	*/
 		/*
-		// РѕРїСЂРґРµР»РµРЅРёРµ РјРѕРґСѓР»СЏ 'jquery.1.7.1' СЃ СѓРєР°Р·Р°РЅРЅС‹Рј path РІ РѕР±СЊРµРєС‚Рµ
+		// опрделение модуля 'jquery.1.7.1' с указанным path в обьекте
 		define('jquery.1.7.1', {path: 'https://code.jquery.com/jquery-1.7.1.min.js'}, function() {
 			console.log("module 'jquery.1.7.1' loaded", arguments);
 			
 			return $;
 		});
 
-		// РѕРїСЂРґРµР»РµРЅРёРµ РјРѕРґСѓР»СЏ 'jquery.1.12.4' СЃ СѓРєР°Р·Р°РЅРЅС‹Рј path РІ РѕР±СЊРµРєС‚Рµ (РёР·РјРµРЅРµРЅРѕ СЃР»РµРґРѕРІР°РЅРёРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ РґР»СЏ РїСЂРёРјРµСЂР° СЂР°Р±РѕС‚С‹)
+		// опрделение модуля 'jquery.1.12.4' с указанным path в обьекте (изменено следование аргументов для примера работы)
 		define('jquery.1.12.4', function() {
 			console.log("module 'jquery.1.12.4' loaded", arguments);
 			
@@ -45,7 +38,8 @@
 		
 	  		*/
 		
-		//РєР°СЃС‚РѕРјРЅС‹Р№ СЃРїРёСЃРѕРє РїР»Р°РіРёРЅРѕРІ РїСЂРѕРµРєС‚Р°
+		/*
+		//кастомный список плагинов проекта
 		var plugins = {
 			"test.module" : {
 				"path" : "berry.test.js"
@@ -53,7 +47,7 @@
 			"jquery.1.7.1" : {
 				"path" : "https://code.jquery.com/jquery-1.7.1.min.js",
 				"callback" : function() {
-					console.log( this )
+					return 123;
 				}
 			},
 			"jquery.1.12.4" : {
@@ -68,11 +62,24 @@
 			console.log('Custom plugins loaded');
 		});
 	  
-	  
-		// РѕРїСЂРґРµР»РµРЅРёРµ РјРѕРґСѓР»СЏ 'live', СЃ Р·Р°РІРёСЃРјРѕСЃС‚СЊСЋ РѕС‚ РјРѕРґСѓР»СЏ 'jquery.1.7.1'
-		define('live', ['jquery.1.7.1'], function(jQuery) {
-			console.log("module 'live' loaded, depence from 'jquery.1.7.1'", arguments, jQuery);
+  
+		// опрделение модуля 'jquery.1.7.1' с указанным path в обьекте
+		define('jquery.1.7.1', {path: 'https://code.jquery.com/jquery-1.7.1.min.js'}, function() {
+			return window;
+		});		  
+		*/
+		
+		// опрделение модуля 'live', с зависмостью от модуля 'jquery.1.7.1'
+		define('live', ['menu'], function(a) {
+			console.log( 1 == a, a);
 		});	  
+
+		// опрделение модуля 'menu'
+		define('menu', function() {
+			var a = 1;
+			return a;
+		});		  		
+	
 
      
 

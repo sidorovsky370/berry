@@ -56,8 +56,6 @@
 	berry.get = function(name, url, skip) {
         var self = this;
 		
-		console.log('GET', arguments);
-		
 		// найдем модуль в массиве определенных модулей
 		var module = self.defined[name] || {};
 		module.storage = self._storage(name, module);
@@ -176,11 +174,20 @@
         }
     }
 
+	
 	// AMD. Определение модуля
 	/* парсим все аргументы, при необходимости заполняем дефолтными значениями. Далее передаем в функцию обновления */
     berry.define = function(name, depents, callback, data) {
-        console.log(arguments);
+		berry.defined
+    }
+	
+	
+	// AMD. Определение модуля
+	/* парсим все аргументы, при необходимости заполняем дефолтными значениями. Далее передаем в функцию обновления */
+    berry._define = function(name, depents, callback, data) {
 
+		console.log('_define', arguments);
+	
         //Если первый полученный аргумент Объект и второй функция или не передан, то значит мы получили конфиг и обработаем его через специальную функцию.
         if (typeof arguments[0] === "object") {
             berry._config(arguments[0], arguments[1]);
@@ -242,13 +249,9 @@
                     var done = false;
 
                     args.depents.forEach(function(depent) {
-						console.log(depent)
-						
 						if (typeof depent === 'string') {
                             //добавим зависимость в массив
                             berry.stack.push(args.depents[depent]);
-
-							console.log('CHECK', depent, berry.stack);
 
                             //проверим массив на повторение, чтобы не было циклической зависимости при вызове модулей
                             if (!berry._check()) {
@@ -302,6 +305,8 @@
             if (config.hasOwnProperty(name)) {
                 var data = config[name];
 				
+				console.log('_CONFIG', name);
+				
                 var response = self.define(name, data.depents, data.callback, self.extend(data, {
                     'require': require
                 }));
@@ -320,13 +325,14 @@
 		if(self.config.debug) console.info('callback-фунция: ', name);
 
 		module.returned = (module.callback)(module.storage);
-		if( module.returned ) { module.storage[name] = module.returned; }
+		if(module.returned) { module.storage[name] = module.returned; }
 
 		module.callback = ( module.storage.length > 0 ) ? function() {} : false;
 		if(self.config.debug) console.info(name+' storage: ', module.storage);
 
 		// вернем значение callback-функции модуля
-		return module.callback;
+//		return (function() {module.callback})();
+		return module.returned;
 	}	
 	
 	// AMD. Обновляем состояние определенных модулей, при необходмости создаем новый модуль
@@ -336,6 +342,7 @@
 
         //находим модуль, если такого модуля нет - создаем новый пустой.
         var module = (self.defined[name]) ? (self.defined[name]) : (self.defined[name] = {});
+		module.name = name;
 
         //если переданы зависимости, до добавим их как новые, либо добавим их как дополнительные
         if (depents) {
@@ -422,7 +429,6 @@
 
 	// инициалиация ядра
     berry.init = function() {
-		console.log( this.config.AMD.plugins )
         if (typeof(this.config.AMD.plugins) === 'string') {
 			this.get('AMDplugins', this.config.AMD.plugins);
         }
