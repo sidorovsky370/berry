@@ -70,8 +70,30 @@
 	berry.defined = {};
 
 	berry.STATE = 'loading';
+	
+	// AMD. Загрузка библиотеки	по url
+	berry._get = function(url) {
+		// возвращаем новый Promise
+		return new Promise(function(resolve, reject) {
+			// создаем get запрос к серверу
+			var xhr = new XMLHttpRequest();
+			xhr.open('GET', url);
+			xhr.onload = function() {
+				if (xhr.status == 200) resolve(xhr.response);
+				else reject(Error(xhr.statusText)); // ошибка, отдаем её статус
 
-	// AMD. Загрузка библиотеки
+				// отлавливаем ошибки сети
+				xhr.onerror = function() {
+				  reject(Error("Network Error"));
+				};
+			}
+			
+			// Делаем запрос
+			xhr.send();			
+		});
+	}	
+
+	// AMD. Получение библиотеки по url
 	berry.get = function(name, url, callback) {
 		var self = this;
 
@@ -81,33 +103,26 @@
 
 		// URL модуля
 		var url = url || module.data.path || false;
-		
 
 		// Если URL модуля есть, то будем его подгружать
 		if (url) {
-			var xhr = new XMLHttpRequest();
-			xhr.open('GET', url, false);
-			xhr.send(null);
+			berry._get(url).then(function(response) {
+				
+				console.log('NANE:', name);
+				// ставим ключ инциализации в true
+				berry.defined[name].data.inited = true;
+				berry.defined[name].data.require = false;
 
-			xhr.onreadystatechange = function() {
-				if (xhr.readyState != 4) return;
-				if (xhr.readyState == 4) {
-					// ставим ключ инциализации в true
-					self.defined[name].data.inited = true;
-					self.defined[name].data.require = false;
+				console.log('getting', name, module.data.inited);
+				
+				if (berry.config.debug) console.info('Модуль ' + name + ' загружен');
 
-					console.log('getting', name, module.data.inited);
-
-					
-					if (self.config.debug) console.info('Модуль ' + name + ' загружен');
-
-					// если у модуля определена callback-функция
-					if (module.callback) berry._scope(name, module);
-					return true;					
-				}
-			}
-			
-			return false;
+				// если у модуля определена callback-функция
+				if (module.callback) berry._scope(name, module);
+				return true;					
+			}, function(error) {
+				console.error("Ошибка!", error);
+			});
 		}
 
 		// Если URL не нашли
@@ -123,6 +138,8 @@
 
 	// AMD. Запрос модуля
 	berry.require = function(depents, callback) {
+		return false; // пока не используется %)
+		
 		var self = this;
 		var done;
 
@@ -206,6 +223,7 @@
 	// AMD. Определение модуля
 	/* парсим все аргументы, при необходимости заполняем дефолтными значениями. Далее передаем в функцию обновления */
 	berry.define = function(name, depents, callback, data) {
+		
 		//Если первый полученный аргумент Объект и второй функция или не передан, то значит мы получили конфиг и обработаем его через специальную функцию.
 		if (typeof arguments[0] === "object") {
 			berry._config(arguments[0], arguments[1]);
