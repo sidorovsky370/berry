@@ -1,45 +1,59 @@
 <!DOCTYPE>
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Berry Index</title>
     
     <script type="text/javascript" charset="UTF-8" src="berry.js"></script>
   </head>
   <body>
     <script>
-	/*
-		// опрделение модуля 'oldmenu' с поддержкой обратной совместимости
+		define('module1', function(d, e) {
+			console.log('TEST A', this);
+			return 'g';
+		});		
+
+		define('module2', {path: '/js/berry/berry.test.js'}, function(a, b) {
+			console.log('TEST TEST', this);
+			return 'c';
+		});
+		
+	
+		
+	/*		
+		// РѕРїСЂРµРґРµР»РµРЅРёРµ РјРѕРґСѓР»СЏ 'menu'
+		define('menu2', [ true, 'common.cookie'], function() {
+			var a = 1;
+			return a;
+		});			
+  	
+		// РѕРїСЂРµРґРµР»РµРЅРёРµ РјРѕРґСѓР»СЏ 'oldmenu' СЃ РїРѕРґРґРµСЂР¶РєРѕР№ РѕР±СЂР°С‚РЅРѕР№ СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё
 		$.define('oldmenu', function() {
 			console.log("module 'oldmenu' loaded");
 			var a = 2;
 			return a;
 		});
 
-		// опрделение модуля 'item' с зависимостью от модуля 'menu'
+		// РѕРїСЂРµРґРµР»РµРЅРёРµ РјРѕРґСѓР»СЏ 'item' СЃ Р·Р°РІРёСЃРёРјРѕСЃС‚СЊСЋ РѕС‚ РјРѕРґСѓР»СЏ 'menu'
 		define('item', ['menu'], function() {
 			console.log("module 'item' loaded, depence from 'menu'");
 		});
-	*/
-		/*
-		// опрделение модуля 'jquery.1.7.1' с указанным path в обьекте
+
+		// РѕРїСЂРµРґРµР»РµРЅРёРµ РјРѕРґСѓР»СЏ 'jquery.1.7.1' СЃ СѓРєР°Р·Р°РЅРЅС‹Рј path РІ РѕР±СЊРµРєС‚Рµ
 		define('jquery.1.7.1', {path: 'https://code.jquery.com/jquery-1.7.1.min.js'}, function() {
 			console.log("module 'jquery.1.7.1' loaded", arguments);
 			
 			return $;
 		});
 
-		// опрделение модуля 'jquery.1.12.4' с указанным path в обьекте (изменено следование аргументов для примера работы)
+		// РѕРїСЂРµРґРµР»РµРЅРёРµ РјРѕРґСѓР»СЏ 'jquery.1.12.4' СЃ СѓРєР°Р·Р°РЅРЅС‹Рј path РІ РѕР±СЊРµРєС‚Рµ (РёР·РјРµРЅРµРЅРѕ СЃР»РµРґРѕРІР°РЅРёРµ Р°СЂРіСѓРјРµРЅС‚РѕРІ РґР»СЏ РїСЂРёРјРµСЂР° СЂР°Р±РѕС‚С‹)
 		define('jquery.1.12.4', function() {
 			console.log("module 'jquery.1.12.4' loaded", arguments);
 			
 			return $;
 		}, {path: 'https://code.jquery.com/jquery-1.12.4.min.js'});
 		
-	  		*/
-		
-		/*
-		//кастомный список плагинов проекта
+		//РєР°СЃС‚РѕРјРЅС‹Р№ СЃРїРёСЃРѕРє РїР»Р°РіРёРЅРѕРІ РїСЂРѕРµРєС‚Р°
 		var plugins = {
 			"test.module" : {
 				"path" : "berry.test.js"
@@ -62,45 +76,39 @@
 			console.log('Custom plugins loaded');
 		});
 	  
-	*/		
-	
-		// опрделение модуля 'live', с зависмостью от модуля 'jquery.1.7.1'
+		// РѕРїСЂРµРґРµР»РµРЅРёРµ РјРѕРґСѓР»СЏ 'live', СЃ Р·Р°РІРёСЃРјРѕСЃС‚СЊСЋ РѕС‚ РјРѕРґСѓР»СЏ 'jquery.1.7.1'
 		define('live', ['menu', 'sub-menu', 'jquery.1.7.1'], function(scope) {
-			console.log('live scope вне функции:', scope);
-			console.log('live scope вне функции:',$.fn, $, window.jQuery)			
+			console.log('live scope РІРЅРµ С„СѓРЅРєС†РёРё:', scope);
+			console.log('live scope РІРЅРµ С„СѓРЅРєС†РёРё:',$.fn, $, window.jQuery)			
 			
 			return (function(m, s, jq) {
 				console.log('live callback: ', m, s, jq);
 			})(scope['menu'], scope['sub-menu'], scope['jquery.1.7.1']);
 		});
 		
-	
-		// опрделение модуля 'menu'
+		// РѕРїСЂРµРґРµР»РµРЅРёРµ РјРѕРґСѓР»СЏ 'jquery.1.7.1' СЃ СѓРєР°Р·Р°РЅРЅС‹Рј path РІ РѕР±СЊРµРєС‚Рµ
+		define('jquery.1.7.1', {path: 'https://code.jquery.com/jquery-1.7.1.min.js'}, function(scope) {
+			console.log('1.7');
+			
+		
+			return (function($) {
+				console.log( $.fn );
+				return $;
+			})(jQuery)
+
+			var a = 10;
+			return a;
+		});			
+
+		// РѕРїСЂРµРґРµР»РµРЅРёРµ РјРѕРґСѓР»СЏ 'menu'
 		define('sub-menu', function() {
 			var b = 4;
 			return b;
 		});
 
-		// опрделение модуля 'menu'
-		define('menu', function() {
-			var a = 1;
-			return a;
-		});		
-  
-		// опрделение модуля 'jquery.1.7.1' с указанным path в обьекте
-		define('jquery.1.7.1', {path: 'https://code.jquery.com/jquery-1.7.1.min.js'}, function(scope) {
-			console.log('1.7');
-			
-		
-			/*
-			return (function($) {
-				console.log( $.fn );
-				return $;
-			})(jQuery)
-			*/
-			var a = 10;
-			return a;
-		});	
+	*/			
+
+
 		
     </script>
   </body>
